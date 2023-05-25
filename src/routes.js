@@ -5,11 +5,16 @@ const UserController = require('./app/Controllers/UserController');
 const JobsController = require('./app/Controllers/JobsController');
 const LoginController = require('./app/Controllers/LoginController');
 
+const AuthController = require('./app/Controllers/AuthController')
+
 const routes = new Router();
 
 // rota do login
-routes.post("/login", LoginController.index);
+routes.post("/login", AuthController.login);
 // fim da rota do login
+
+
+routes.use(AuthController.verifyToken)
 
 // rotas do user
 routes.get("/user", UserController.index);

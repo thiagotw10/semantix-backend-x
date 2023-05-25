@@ -1,22 +1,27 @@
-const mongoose = require('mongoose');
-
+const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
 class Connection {
     constructor(){
-        this.mongoDB();
+        this.sequelizeDB();
     }
 
 
-    mongoDB(){
+   async sequelizeDB(){
 
-        this.mongo = mongoose.connect("mongodb+srv://thiagotw10:matheus123@ipnode.qibol.mongodb.net/ipnode?retryWrites=true&w=majority", {
-        }).then(() => {
+        const sequelize = new Sequelize(process.env.DATA_BASE, process.env.USER, process.env.PASSWORD, {
+          host: process.env.HOST,
+          dialect: 'mysql'
+        });
 
-            console.log("Conexão estabelicida com o MongoDB");
+        try {
+          await sequelize.authenticate();
+          console.log('Conexão estabelecida com o banco de dados');
+          this.sequelize = sequelize;
+        } catch (error) {
+          console.error('Erro ao estabelecer conexão com o banco de dados:', error);
+        }
 
-          }).catch((error) => {
-            console.log(`Erro ao estabelecer conexão com mongoDB: ${error}`)
-          })
     }
 
 

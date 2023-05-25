@@ -1,12 +1,31 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const conection = require('../../../config/Connection.js');
+// Acesso à instância sequelize
+async function defineUserModel() {
+    const User = conection.sequelize.define('User', {
+        nome: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        email: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true
+        },
+        senha: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        telefone: {
+          type: DataTypes.STRING,
+          allowNull: false
+        }
+      });
 
-const User = mongoose.Schema(
-    {
-        nome: { type: String, require: true},
-        email: { type: String, require: true},
-        senha: { type: String, require: true},
-        telefone: { type: String, require: true},
-    }
-)
+      await User.sync(); // Aguarda a conclusão da sincronização do modelo
 
-module.exports = mongoose.model('user', User);
+      return User;
+}
+
+
+module.exports = defineUserModel;

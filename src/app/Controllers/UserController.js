@@ -6,8 +6,8 @@ const { json } = require('express/lib/response');
 class UserController {
 
    async index(req, res){
-
-        let valor = User.find({}).lean().exec();
+        const user = await User();
+        let valor = user.findAll();
         const data = await valor;
         console.log(data)
 
@@ -20,7 +20,7 @@ class UserController {
     }
 
     async add(req, res){
-
+        const user = await User();
 
         // validação de campos pelo yup 
             let schema = yup.object().shape({
@@ -40,16 +40,18 @@ class UserController {
         //   fim yup
 
 
+   
         
-        let userExistEmail = await User.findOne({ email: req.body.email});
+        let userExistEmail = await user.findOne({ where: { email: req.body.email } });
 
         if(userExistEmail){
-
+            console.log(userExistEmail)
             return res.status(400).json({
                 message: "nome ou email já existe."
             })
         }
-        let userExistNome = await User.findOne({nome: req.body.nome });
+        
+        let userExistNome = await user.findOne({ where: {nome: req.body.nome }});
 
         if(userExistNome){
 
@@ -70,19 +72,20 @@ class UserController {
 
         data.senha = await bcrypt.hash(data.senha, 8);
 
-        await User.create(data, (err)=>{
-            if(err)
-            return res.status(400).json({
-                message: "erro ao tentar inserir usuario"
-            })
-
-
+        try {
+            await user.create(data)
             return res.status(200).json({
                 message: "usuario cadastrado com sucesso!!"
             })
-        })
-
-        console.log(req.body);
+        } catch (error) {
+            return res.status(400).json({
+                message: "erro ao tentar inserir usuario"
+            })
+        }finally{
+            console.log(req.body);
+        }
+        
+        
 
     }
 
