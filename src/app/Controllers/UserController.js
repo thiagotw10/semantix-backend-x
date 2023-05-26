@@ -91,27 +91,32 @@ class UserController {
 
 
    async edit(req, res){
-
+        const user = await User();
         let id = req.params.id;
+        console.log(id)
 
-        User.findById(id, function (err, adventure) {
-            if(err)
-            return res.status(400).json({
-                erro:true 
-            })
-
-            let data = adventure;
+        try {
+            const dados = await user.findByPk(id);
+            if(!dados){
+                return res.status(400).json({
+                    message: 'dados não encontrado.',
+                    erro:true 
+                })
+            }
             return res.status(200).json({
                 message: `user ${id} `,
-                data
+                data: dados
             })
-
-        });
+        } catch (error) {
+            return res.status(500).json({
+                erro:true 
+            })
+        }
 
     }
 
    async update(req, res){
-
+        const user = await User();
         let id =  req.params.id;
 
         const {nome, email, senha, telefone} = req.body;
@@ -123,53 +128,65 @@ class UserController {
             telefone
          }
 
-   if(data.senha){
-            data.senha = await bcrypt.hash(data.senha, 8);
+         
 
-            User.findByIdAndUpdate(id, { nome: data.nome, email: data.email, senha: data.senha, telefone: data.telefone }, function(err, valid){
-                if(err)
+         try {
+            const dados = await user.findByPk(id);
+            if(!dados){
                 return res.status(400).json({
-                    erro:true 
+                    message: `usuario não encontrado!!`,
                 })
-    
-                return res.status(200).json({
-                    message: `usuario editado com sucesso!!`,
-                })
-    
-    
+            }
+            dados.nome = data.nome || dados.nome;
+            dados.email = data.email || dados.email;
+            if(data.senha){
+                data.senha = await bcrypt.hash(data.senha, 8);
+            }
+            dados.senha = data.senha || dados.senha;
+            dados.telefone = data.telefone || dados.telefone;
+            await dados.save()
+
+            return res.status(200).json({
+                message: `usuario editado com sucesso!!`,
+                usuario: dados 
             })
-        }else{
-            User.findByIdAndUpdate(id, { nome: data.nome, email: data.email, telefone: data.telefone }, function(err, valid){
-                if(err)
-                return res.status(400).json({
-                    erro:true 
-                })
-    
-                return res.status(200).json({
-                    message: `usuario editado com sucesso!!`,
-                })
-    
-    
+            
+         } catch (error) {
+            return res.status(500).json({
+                message: true,
             })
-        }
+         }
+
+      
     }
 
 
-    delete(req, res){
-
+   async delete(req, res){
+        const user = await User();
         let id =  req.params.id;
 
-        User.findByIdAndRemove(id, function(err, valid){
-            if(err)
-            return res.status(400).json({
-                erro:true 
-            })
 
+        try {
+            const dados = await user.findByPk(id);
+            if(!dados){
+                return res.status(400).json({
+                    message: 'usuario não encontrado',
+                    erro:true 
+                })
+            }
+
+            await dados.destroy()
 
             return res.status(200).json({
                 message: `usuario deletado com sucesso!!`,
             })
-        })
+
+        } catch (error) {
+            return res.status(500).json({
+                erro:true 
+            })
+        }
+
     }
 
 

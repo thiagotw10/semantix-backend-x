@@ -59,7 +59,6 @@ const verifyToken = (req, res, next) => {
   // Verifique o token JWT usando a chave secreta
   jwt.verify(tokenSemBearer, secretKey, (err, decoded) => {
     if (err) {
-        console.log(err)
       return res.status(401).json({ message: 'Token inválido' });
     }
 
