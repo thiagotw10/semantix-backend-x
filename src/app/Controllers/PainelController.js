@@ -79,20 +79,35 @@ class PainelController {
         console.log(guiche)
         
         senha.status = 'indisponivel'
-        senha.save()
+        await senha.save()
         guiche.status = 'indisponivel'
-        guiche.save()
+        await guiche.save()
 
-        modelSenhaGuiche.create({
+       await modelSenhaGuiche.create({
             id_senha: senha.id,
             id_guiche: guiche.id
         })
 
 
+        let todosDados = []
+        let existeAndamento = 'nao'
+        console.log(guiche)
+        let valor = await modelSenha.findAll({where: {status: 'disponivel'}})
+        if(guiche.id){
+            let guicheOne = await modelSenhaGuiche.findOne({where: {id_guiche: guiche.id}})
+            if(guicheOne){
+                let senha = await modelSenha.findAll({where: {id: guicheOne.dataValues.id_senha}})
+                todosDados.push({...senha[0].dataValues});
+                existeAndamento = 'sim'
+            }
+        }
+        todosDados.push(...valor);
+        
+       
         return res.status(200).json({
-            message: "senhas",
-            guiche: guiche,
-            senha: senha
+            message: "mostrando todas as senhas geradas",
+            data: todosDados,
+            andamento: existeAndamento
         })
     }
 

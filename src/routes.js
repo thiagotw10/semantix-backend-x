@@ -27,7 +27,7 @@ routes.delete("/user/:id", UserController.delete);
 // fim rotas do user
 
 // rotas das senhas
-routes.get("/senha", JobsController.index);
+routes.post("/senhas", JobsController.index);
 routes.post("/senha", JobsController.add);
 routes.get("/senha/:id", JobsController.edit);
 routes.put("/senha/:id", JobsController.update);

@@ -1,6 +1,7 @@
 const Senha = require('./Models/Senhas');
 const yup = require('yup');
 const { json } = require('express/lib/response');
+const SenhaGuiche = require('./Models/SenhaGuiche');
 
 class JobsController {
    
@@ -8,14 +9,28 @@ class JobsController {
 
 
     async index(req, res){
+        const { guiche } = req.body
+        let todosDados = []
+        let existeAndamento = 'nao'
+        console.log(guiche)
         const modelSenha = await Senha()
-        let valor = modelSenha.findAll()
-        const data = await valor;
-        console.log(data)
-
+        const modelSenhaGuiche = await SenhaGuiche()
+        let valor = await modelSenha.findAll({where: {status: 'disponivel'}})
+        if(guiche){
+            let guicheOne = await modelSenhaGuiche.findOne({where: {id_guiche: guiche}})
+            if(guicheOne){
+                let senha = await modelSenha.findAll({where: {id: guicheOne.dataValues.id_senha}})
+                todosDados.push({...senha[0].dataValues});
+                existeAndamento = 'sim'
+            }
+        }
+        todosDados.push(...valor);
+        
+       
         return res.status(200).json({
             message: "mostrando todas as senhas geradas",
-            data
+            data: todosDados,
+            andamento: existeAndamento
         })
 
         
