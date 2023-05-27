@@ -25,26 +25,33 @@ const login = async (req, res) => {
     //   fim yup
 
     let userExistEmail = await user.findOne({ where:{ email: email} });
+    if(userExistEmail){
+      const senhaVerifica = await bcrypt.compare(senha, userExistEmail.senha);
 
-    const senhaVerifica = await bcrypt.compare(senha, userExistEmail.senha);
+      if(senhaVerifica){
+          
+          const token = jwt.sign({ userId: userExistEmail.id }, secretKey, { expiresIn: '1h' });
 
-    if(userExistEmail && senhaVerifica){
-        
-        const token = jwt.sign({ userId: userExistEmail.id }, secretKey, { expiresIn: '1h' });
+          return res.status(200).json({
+              message: "conectado com sucesso!!",
+              user: userExistEmail,
+              token_acesso: token
+          })
+          
 
-        return res.status(200).json({
-            message: "conectado com sucesso!!",
-            user: userExistEmail,
-            token_acesso: token
-        })
-        
-
+      }else{
+          return res.status(400).json({
+              message: "email ou senha errado"
+          })
+      }
     }else{
-        return res.status(400).json({
-            message: "email ou senha errado"
-        })
+      return res.status(400).json({
+          message: "email ou senha errado"
+      })
     }
-  // Se as credenciais estiverem corretas, crie o token JWT
+
+    
+  
   
 };
 

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const conection = require('../../../config/Connection.js');
 // Acesso à instância sequelize
-async function defineUserModel() {
+async function modeloUser() {
     const User = conection.sequelize.define('User', {
         nome: {
           type: DataTypes.STRING,
@@ -28,4 +28,4 @@ async function defineUserModel() {
 }
 
 
-module.exports = defineUserModel;
+module.exports = modeloUser;

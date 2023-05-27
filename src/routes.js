@@ -2,10 +2,12 @@ const {Router} = require('express');
 
 
 const UserController = require('./app/Controllers/UserController');
-const JobsController = require('./app/Controllers/JobsController');
+const JobsController = require('./app/Controllers/SenhasController');
 const LoginController = require('./app/Controllers/LoginController');
 
-const AuthController = require('./app/Controllers/AuthController')
+const AuthController = require('./app/Controllers/AuthController');
+const PainelController = require('./app/Controllers/PainelController');
+const { route } = require('./app');
 
 const routes = new Router();
 
@@ -24,13 +26,26 @@ routes.put("/user/:id", UserController.update);
 routes.delete("/user/:id", UserController.delete);
 // fim rotas do user
 
-// rotas do jobs
-routes.get("/jobs", JobsController.index);
-routes.post("/jobs", JobsController.add);
-routes.get("/jobs/:id", JobsController.edit);
-routes.put("/jobs/:id", JobsController.update);
-routes.delete("/jobs/:id", JobsController.delete);
-// fim rotas do jobs
+// rotas das senhas
+routes.get("/senha", JobsController.index);
+routes.post("/senha", JobsController.add);
+routes.get("/senha/:id", JobsController.edit);
+routes.put("/senha/:id", JobsController.update);
+routes.delete("/senha/:id", JobsController.delete);
+// fim rotas do senhas
+
+
+// criar guicher
+
+routes.post("/guiche", PainelController.add)
+
+// chamar senha 
+routes.post("/chamar", PainelController.chamarSenha)
+
+// trazer guiches
+
+routes.get("/guiche", PainelController.trazerGuiches)
+
 
 
 

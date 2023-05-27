@@ -5,40 +5,31 @@ const routes = require('./routes');
 require('dotenv').config();
 require('./config/Connection');
 
-
 class App {
+  constructor() {
+    this.app = express();
+    this.middlewares();
+    this.routes();
+  }
 
-    constructor(){
-        this.app = express();
-        this.middlewares();
-        this.routes();
-    }
+  middlewares() {
+    this.app.use(cors());
+    this.app.use(express.json());
+    this.app.use(morgan('dev'));
+    this.app.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+      res.header(
+        'Access-Control-Allow-Headers',
+        'Access, Content-type, Authorization, Accept, Origin, X-Requested-With'
+      );
+      next();
+    });
+  }
 
-
-    middlewares(){
-        this.app.use(express.json());
-        this.app.use(morgan('dev'));
-        this.app.use((req, res, next) =>{
-            
-            
-           res.header("Access-Control-Allow-Origin", "*");
-           res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-           res.header("Access-Control-Allow-Headers", "Access, Content-type, Authorization, Acept, Origin, X-Requested-With")
-
-      
-            this.app.use(cors());
-            next();
-        })
-    }
-
-
-    routes(){
-        this.app.use(routes);
-    }
-
-
-
+  routes() {
+    this.app.use(routes);
+  }
 }
-
 
 module.exports = new App().app;
