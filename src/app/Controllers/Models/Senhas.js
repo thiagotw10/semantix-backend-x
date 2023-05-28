@@ -7,7 +7,7 @@ async function Senhas() {
           type: DataTypes.STRING,
           allowNull: false
         },
-        prioridade: {
+        tipo_atendimento: {
           type: DataTypes.STRING,
           allowNull: false
         },

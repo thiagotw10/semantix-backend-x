@@ -29,9 +29,6 @@ routes.delete("/user/:id", UserController.delete);
 // rotas das senhas
 routes.post("/senhas", JobsController.index);
 routes.post("/senha", JobsController.add);
-routes.get("/senha/:id", JobsController.edit);
-routes.put("/senha/:id", JobsController.update);
-routes.delete("/senha/:id", JobsController.delete);
 // fim rotas do senhas
 
 
@@ -53,5 +50,8 @@ routes.get("/historico", PainelController.trazerSenhasGuiches)
 // finalizar atendimento
 
 routes.post("/finalizar", PainelController.finalizar)
+
+// cancelar atendimento
+routes.post("/cancelar", PainelController.cancelar)
 
 module.exports = routes;

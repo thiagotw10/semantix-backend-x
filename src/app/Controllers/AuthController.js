@@ -30,7 +30,7 @@ const login = async (req, res) => {
 
       if(senhaVerifica){
           
-          const token = jwt.sign({ userId: userExistEmail.id }, secretKey, { expiresIn: '1h' });
+          const token = jwt.sign({ userId: userExistEmail.id }, secretKey, { expiresIn: '30d' });
 
           return res.status(200).json({
               message: "conectado com sucesso!!",

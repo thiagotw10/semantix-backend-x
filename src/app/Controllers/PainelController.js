@@ -1,6 +1,7 @@
 const Senha = require('./Models/Senhas');
 const Guiche = require('./Models/Guiches');
 const SenhaGuiche = require('./Models/SenhaGuiche');
+const Movimentacoes = require('./Models/Movimentacoes');
 
 const yup = require('yup');
 const { json } = require('express/lib/response');
@@ -62,6 +63,7 @@ class PainelController {
         const modelSenha = await Senha()
         const modelGuiche = await Guiche()
         const modelSenhaGuiche = await SenhaGuiche()
+        const movimentacao = await Movimentacoes()
 
         const { numero_guiche, numero_senha } = req.body
 
@@ -81,6 +83,12 @@ class PainelController {
        await modelSenhaGuiche.create({
             id_senha: senha.id,
             id_guiche: guiche.id
+        })
+
+        await movimentacao.create({
+            numero_guiche: numero_guiche,
+            numero_senha: numero_senha,
+            status: 'em_andamento'
         })
 
 
@@ -140,6 +148,7 @@ class PainelController {
                 dados.push({
                   senha: senha.senha,
                   guiche: guiche.numero_guiche,
+                  tipo_atendimento: senha.tipo_atendimento,
                   data_hora: val.createdAt
                 });
               }
@@ -174,6 +183,7 @@ class PainelController {
         const modelSenhaGuiche = await SenhaGuiche()
         const modelSenha = await Senha()
         const modelGuiche = await Guiche()
+        const movimentacao = await Movimentacoes()
         let senhas = await modelSenha.findOne({where: {senha: senha}})
         let dados = await modelSenhaGuiche.findOne({where: {id_senha: senhas.id}})
         if(dados){
@@ -181,12 +191,58 @@ class PainelController {
            let guiches = await modelGuiche.findOne({where: {numero_guiche: guiche} })
             guiches.status = 'disponivel'
             await guiches.save()
+
+            await movimentacao.create({
+                numero_guiche: guiche,
+                numero_senha: senha,
+                status: 'finalizado'
+            })
+
             return res.status(200).json({
                 message: "Registro apagado",
             });
         }
     }
 
+
+    async cancelar(req, res){
+        const {senha, guiche} = req.body
+        const modelSenhaGuiche = await SenhaGuiche()
+        const modelSenha = await Senha()
+        const modelGuiche = await Guiche()
+        const movimentacao = await Movimentacoes()
+        let senhas = await modelSenha.findOne({where: {senha: senha}})
+        let dados = await modelSenhaGuiche.findOne({where: {id_senha: senhas.id}})
+        if(dados){
+           await dados.destroy()
+           let guiches = await modelGuiche.findOne({where: {numero_guiche: guiche} })
+            guiches.status = 'disponivel'
+            await guiches.save()
+
+            await movimentacao.create({
+                numero_guiche: guiche,
+                numero_senha: senha,
+                status: 'cancelado'
+            })
+
+            return res.status(200).json({
+                message: "Registro apagado",
+            });
+        }
+
+        senhas.status = 'indisponivel'
+        await senhas.save()
+
+        await movimentacao.create({
+            numero_guiche: guiche,
+            numero_senha: senha,
+            status: 'cancelado'
+        })
+
+        return res.status(200).json({
+            message: "Registro apagado",
+        });
+    }
 
 
 

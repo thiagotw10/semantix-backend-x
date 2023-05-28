@@ -38,9 +38,9 @@ class JobsController {
 
     async add(req, res){
         // gerar senhas aleatorias
-        const { prioridade } = req.body;
+        const { tipo_atendimento } = req.body;
         let schema = yup.object().shape({
-            prioridade: yup.string().required(),
+            tipo_atendimento: yup.string().required(),
         })
 
         
@@ -50,10 +50,10 @@ class JobsController {
             })
         }
 
-        console.log(prioridade)
-        if(prioridade != 'sim' && prioridade != 'nao'){
+
+        if(tipo_atendimento != 'prioridade' && tipo_atendimento != 'geral' && tipo_atendimento != 'exame'){
             return res.status(400).json({
-                message: "prioridade precisa ter valor sim ou nao"
+                message: "tipo_atendimento só pode ser prioridade, geral ou exame"
             })
         }
 
@@ -72,7 +72,7 @@ class JobsController {
 
         const senhaCriada = await modelSenha.create({
             senha: gerarSequenciaAleatoria(),
-            prioridade: prioridade
+            tipo_atendimento: tipo_atendimento
         })
 
         if(senhaCriada){
