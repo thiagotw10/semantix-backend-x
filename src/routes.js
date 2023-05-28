@@ -46,8 +46,12 @@ routes.post("/chamar", PainelController.chamarSenha)
 
 routes.get("/guiche", PainelController.trazerGuiches)
 
+// historico
 
+routes.get("/historico", PainelController.trazerSenhasGuiches)
 
+// finalizar atendimento
 
+routes.post("/finalizar", PainelController.finalizar)
 
 module.exports = routes;

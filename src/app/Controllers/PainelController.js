@@ -38,9 +38,6 @@ class PainelController {
             })
         }
 
-        
-
-        console.log(numero_guiche)
         const modelGuiche = await Guiche()
         let guiche = await modelGuiche.findOne({where: {numero_guiche: numero_guiche} })
 
@@ -75,9 +72,7 @@ class PainelController {
                 message: "A senha ou guichê estar indisponivel",
             })
         }
-        console.log(senha)
-        console.log(guiche)
-        
+  
         senha.status = 'indisponivel'
         await senha.save()
         guiche.status = 'indisponivel'
@@ -127,8 +122,46 @@ class PainelController {
     }
 
 
-    async edit(req, res){
+    async trazerSenhasGuiches(req, res){
+        const modelSenha = await Senha()
+        const modelGuiche = await Guiche()
+        const modelSenhaGuiche = await SenhaGuiche()
 
+        let historio = await modelSenhaGuiche.findAll({where: {status: 'em_atendimento'}, order: [['createdAt', 'DESC']], limit: 5})
+
+        function retorno(historico) {
+            return new Promise(async (resolve, reject) => {
+              let dados = [];
+          
+              for (const val of historico) {
+                let senha = await modelSenha.findOne({ where: { id: val.id_senha } });
+                let guiche = await modelGuiche.findOne({ where: { id: val.id_guiche } });
+          
+                dados.push({
+                  senha: senha.senha,
+                  guiche: guiche.numero_guiche,
+                  data_hora: val.createdAt
+                });
+              }
+          
+              resolve(dados);
+            });
+          }
+          
+          try {
+            const dados = await retorno(historio);
+          
+            return res.status(200).json({
+              message: "historio e chamadas",
+              historico: dados
+            });
+          } catch (error) {
+            return res.status(500).json({
+              message: "Erro ao trazer senhas de guichês",
+              error: error.message
+            });
+          }
+          
     }
 
     async update(req, res){
@@ -136,8 +169,22 @@ class PainelController {
     }
 
 
-    async delete(req, res){
- 
+    async finalizar(req, res){
+        const {senha, guiche} = req.body
+        const modelSenhaGuiche = await SenhaGuiche()
+        const modelSenha = await Senha()
+        const modelGuiche = await Guiche()
+        let senhas = await modelSenha.findOne({where: {senha: senha}})
+        let dados = await modelSenhaGuiche.findOne({where: {id_senha: senhas.id}})
+        if(dados){
+           await dados.destroy()
+           let guiches = await modelGuiche.findOne({where: {numero_guiche: guiche} })
+            guiches.status = 'disponivel'
+            await guiches.save()
+            return res.status(200).json({
+                message: "Registro apagado",
+            });
+        }
     }
 
 
